@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Animal;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class AnimalController extends Controller
 {
@@ -28,7 +29,9 @@ class AnimalController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $animal=Animal::create($request->all());
+        $animal=$animal->refresh();
+        return response($animal,201);
     }
 
     /**
