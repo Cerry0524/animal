@@ -45,10 +45,7 @@ class Handler extends ExceptionHandler
                     Response::HTTP_NOT_FOUND
                 );
             }
-            return response()->json(
-                [
-                    'error' => '找不到資源'
-                ],);
+         
         }
         return parent::render($request, $exception);
     }
