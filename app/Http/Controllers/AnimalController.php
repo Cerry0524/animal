@@ -33,9 +33,9 @@ class AnimalController extends Controller
                 if($value=='asc' || $value=='desc'){
                     $query->orderBy($key,$value);
                 }
-            }else{
-                $query->orderBy('id', 'desc')
             }
+            }else{
+                $query->orderBy('id', 'desc');
         }
 
 
