@@ -11,9 +11,11 @@ class AnimalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $limit = $request->limit??10;
+        $animals=Animal::orderBy('id','desc')->paginate($limit)->appends($request->query());
+        return response($animals,Response::HTTP_OK);
     }
 
     /**
@@ -39,7 +41,7 @@ class AnimalController extends Controller
      */
     public function show(Animal $animal)
     {
-        //
+        return response($animal,Response::HTTP_OK);
     }
 
     /**
@@ -55,7 +57,8 @@ class AnimalController extends Controller
      */
     public function update(Request $request, Animal $animal)
     {
-        //
+        $animal->update($request->all());
+        return response($animal,Response::HTTP_OK);
     }
 
     /**
