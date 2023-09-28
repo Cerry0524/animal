@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Animal;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Cache;
 
 class AnimalController extends Controller
 {
@@ -13,6 +14,26 @@ class AnimalController extends Controller
      */
     public function index(Request $request)
     {
+        //使用網址設定為快取檔案名稱
+        //取得網址
+
+        $url=$request->url();
+        //取得query參數 例如?limit=5&page=2 網址問號後面參數
+        $queryParams=$request->query();
+        //每個人請求query順序可能不同，使用參數第一個英文字母排序
+        ksort($queryParams);
+        //利用http_bulid_query($queryParams)將查詢方法轉變為字串
+        $queryString=http_build_query($queryParams);
+        //組合成完整網址
+        $fullUrl="{$url}{$queryString}";
+
+        //檢查是否有快取紀錄
+        if(Cache::has($fullUrl)){
+            //使用return 直接回傳快取資料不做其他程式邏輯
+            return Cache::get($fullUrl);
+        }
+
+
         $limit = $request->limit ?? 10;
 
         $query = Animal::query();//建立查詢建構器，分段撰寫SQL語句
@@ -41,7 +62,9 @@ class AnimalController extends Controller
 
         $animals = $query->paginate($limit) //使用分頁功能，使用後資料會自動被DATA包起來
         ->appends($request->query());//回傳參數到URL＄後面方便使用
-        return response($animals, Response::HTTP_OK);
+        return Cache::remember($fullUrl,60,function()use($animals){//記住快取60秒
+            return response($animals, Response::HTTP_OK);
+        });
     }
 
     /**
